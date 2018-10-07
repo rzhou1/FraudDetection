@@ -1,2 +1,2 @@
-# Fraud detection: predicting that the first transaction of a new user is fraudulent.
-Fraud detection: an example of feature extraction (creation), data preprocessing and machine learning modeling
+# Fraud detection: Exploring feature extraction for predicting that the first transaction of a new user is fraudulent.
+This repo exemplifies feature extraction (creation) from raw dataset for building machine learning models to predict fraudulent transaction occuring in e-commerce websites.
