@@ -18,9 +18,9 @@ This repo exemplifies feature extraction from raw dataset for building machine l
   5). Besides, since device_id can be shared by many unique users, "total_purchase" and/or "average_purchase" for each device_id may also imply whether activities are fraudulent or not.
   6). In addition, fraudulent activities can occur in aggregation in a particular region (country here). So, having a feature showing number of users ('country_count') from the same country might be useful (or redundant).
   
-  ###|user_id|signup_time|purchase_time|purchase_value|device_id|source|browser|sex|age|ip_address|country|
-  ###|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-  ###|1.0|1.0|0.997135|0.000807|0.912939|0.00020|0.000033|0.000013|0.000384|0.949706|0.001198|
+  |user_id|signup_time|purchase_time|purchase_value|device_id|source|browser|sex|age|ip_address|country|
+  |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+  |1.0|1.0|0.997135|0.000807|0.912939|0.00020|0.000033|0.000013|0.000384|0.949706|0.001198|
 
   Table 1. Columns' uniqueness of the original dataset.
 
