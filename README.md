@@ -27,16 +27,17 @@ Table 1. Data's uniqueness in each column from the original dataset.
   
 #Model
    
-|Metrics|RandomForest|XGBoost|
-|:---:|:---:|:---:|
-|accuracy|0.958354|0.958596|
-|precision|0.993905|0.999562|
-|recall|0.549194|0.548713|
-|f1|0.707468|0.708495|
-|auc|0.842105|0.850986|
-|confusion_matrix|[[41163, 14], [1874, 2283]]|[[41176, 1], [1876, 2281]]|
+|Metrics|RandomForest|XGBoost|RandomForest (selected features)|XGBoost (selected features)|
+|:---:|:---:|:---:|:---:|:---:|
+|accuracy|0.958354|0.958596|0.958618|0.958596|
+|precision|0.993905|0.999562|1|0.999562|
+|recall|0.549194|0.548713|0.548713|0.548713|
+|f1|0.707468|0.708495|0.708605|0.708495|
+|auc|0.842105|0.850986|0.842105|0.850042|
+|confusion_matrix|[[41163, 14], [1874, 2283]]|[[41176, 1], [1876, 2281]]|[[41177, 0], [1876, 2281]]|[[41176, 1], [1876, 2281]]|
+  
 
-Table 2. Prediction metrics from both RandomForest and XGBoost.
+Table 2. Prediction metrics from both RandomForest and XGBoost. Here "selected features" means modeling with the top 15 most important features based on feature_importances output from the inital models with full features.
   
   After data preprocessing and split of train and test data, we can feed the data to machine learning models. Here we build both RandomForest and XGBoost models. Overall, two models result in very good performance (table 2), in particular predicting almost unity precision. However, recall has been sacrificed with the threshold (0.5) for perfect precision (almost no false negatives). Thus, here receiver operating characteristics (roc) curve, independent of threshold selected, could provide a better metrics for evaluating model performance. As shown in Figure 1. generally both models perform well and show auc ~0.85.
 
@@ -45,19 +46,21 @@ Table 2. Prediction metrics from both RandomForest and XGBoost.
   
   Figure 1. ROC curves for fraud detection modeled by RandomForest and XGBoost.
   
-  We can also output feature_importance from both models and re-evaluate the features created above.
-#Summary and business suggestion
+  To evaluate the importance / usefulness of features extracted, we output feature importances from both models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models, suggesting that they are well learned by machine learning models. In real business world, there are always a tradeoff between computation speed and model accuracy due to the big data. Can we select a few most important features for modeling to get comparable results as models built with full features? We re-built the RandomForest and XGBoost models using their top 15 most important features. Surprisingly, as shown in Table 2, there are almost no penalty with less features.
 
 |Rank|RandomForest|XGBoost|
 |:---:|:---:|:---:|
 |1|time_diff|time_diff|
 |2|WOTY_purchase|device_id_unique_users|
 |3|total_purchase|ip_address|
-|4||device_id|
-|5||age|
-|6||total_purchase|
-|7||source_direct|
-|8||avg_purchase|
-|9||WOTY_purchase|
-|10||country_Belgium|
+|4|ip_users|device_id|
+|5|device_id_unique_users|age|
+|6|WOTY_signup|total_purchase|
+|7|DOTW_signup_Monday|source_direct|
+|8|DOTW_purchase_Monday|avg_purchase|
+|9|ip_address|WOTY_purchase|
+|10|avg_purchase|country_Belgium|
 
+Table 3. The top 10 most important features based on RandomForest and XGBoost models.
+
+#Summary and business suggestion
