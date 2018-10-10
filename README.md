@@ -15,7 +15,8 @@ This repo exemplifies feature extraction from raw dataset for building machine l
   |signup_time|purchase_time|purchase_value|device_id|browser|age|ip_address|country|
   |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
   |1.0|0.997135|0.000807|0.912939|0.000033|0.00038|0.94970|0.001198|  
-  Table 1. Data's uniqueness in each column from the original dataset. 
+  
+Table 1. Data's uniqueness in each column from the original dataset. 
   
   1). The original signup time and purchase time are random, continuous and 100% unique, but the time difference ("time_diff") between signup time and purchase time may show characteristics of fraudulent activity, such as flash transaction suggesting automative trading, a constant time difference may also suggest fraudulent automotive trading, etc.
   2). The ip address itself again does not carry characteristics for modeling (~95% data uniqueness). However, if many users use the same ip address, it may suggest fraudulent activity. Thus, we can extract feature of "ip_users" (how many unique users use the same ip address?).
@@ -34,6 +35,7 @@ This repo exemplifies feature extraction from raw dataset for building machine l
 |f1|0.707468|0.708495|
 |auc|0.842105|0.850986|
 |confusion_matrix|[[41163, 14], [1874, 2283]]|[[41176, 1], [1876, 2281]]|
+
 Table 2. Prediction metrics from both RandomForest and XGBoost.
   
   After data preprocessing and split of train and test data, we can feed the data to machine learning models. Here we build both RandomForest and XGBoost models. Overall, two models result in very good performance (table 2), in particular predicting almost unity precision. However, recall has been sacrificed with the threshold (0.5) for perfect precision (almost no false negatives). Thus, here receiver operating characteristics (roc) curve, independent of threshold selected, could provide a better metrics for evaluating model performance. As shown in Figure 1. generally both models perform well and show auc ~0.85.
@@ -43,5 +45,19 @@ Table 2. Prediction metrics from both RandomForest and XGBoost.
   
   Figure 1. ROC curves for fraud detection modeled by RandomForest and XGBoost.
   
-
+  We can also output feature_importance from both models and re-evaluate the features created above.
 #Summary and business suggestion
+
+|Rank|RandomForest|XGBoost|
+|:---:|:---:|:---:|
+|1|time_diff|time_diff|
+|2|WOTY_purchase|device_id_unique_users|
+|3|total_purchase|ip_address|
+|4||device_id|
+|5||age|
+|6||total_purchase|
+|7||source_direct|
+|8||avg_purchase|
+|9||WOTY_purchase|
+|10||country_Belgium|
+
