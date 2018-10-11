@@ -6,7 +6,7 @@ This repo exemplifies feature extraction from raw dataset for building machine l
   
   Transaction in e-commerce websites has high risk of users performing fraudulent activities such as doing money laundry, using stolen identity and credit card, etc. due to unscreened and diversified background of users. The rise in artificial intelligent (machine learning in specific) enables to detect these fraudulent activities with accuracy and real-time. However, the activities and background of a new user visiting a website (called data) are usually not directly learnable by machine learning algorithms. Feature extraction from activity records and feature transformation from user's background are a necessity as well as a prerequisite for building a machine learning model.
     
-   In this repo, we have a dataset containing a website selling clothes and the first transaction activities of new users. The users' activity and background are collected when they visited and performed activities at the website. Here the purpose is to build a machine learning model to predict (in real time) whether a new user is performing fraudulent activity. Also, based on model outputs, what kind of users' experience could be recommended to the website.
+   In this repo, we have a dataset containing a website selling clothes and the first transaction activities of new users. The users' activity and background are collected when they visited and performed activities at the website. Here the purpose is to build a model to predict (in real time) whether a new user is performing fraudulent activity. Also, based on model outputs, what kind of users' experience could be recommended to the website.
 
 #Feature extraction
 
@@ -39,14 +39,14 @@ Table 1. Data's uniqueness in each column from the original dataset.
 
 Table 2. Prediction metrics from both RandomForest and XGBoost. Here "selected features" means modeling with the top 15 most important features based on feature_importances output from the inital models with full features.
   
-  After data preprocessing and split of train and test data, we can feed the data to machine learning models. Here we build both RandomForest and XGBoost models. Overall, two models result in very good performance (table 2), in particular predicting almost unity precision. However, recall has been sacrificed with the threshold (0.5) for perfect precision (almost no false negatives). Thus, here receiver operating characteristics (roc) curve, independent of threshold selected, could provide a better metrics for evaluating model performance. As shown in Figure 1. generally both models perform well and show auc ~0.85.
+  After data preprocessing and split of train and test data, we can feed the data to machine learning models. Here we build both RandomForest and XGBoost models. Overall, two models result in very good performance (table 2), in particular predicting almost unity precision. However, recall has been sacrificed with the threshold (0.5) for perfect precision (almost no false negatives). Rather, receiver operating characteristics (roc) curve provides a threshold-independent measurement of evaluating model performance. As shown in Figure 1. generally both models perform well and show auc ~0.85. If we want to minimize false negatives, default threshold (0.5) works well (like the predictions from the two models). Well, if we want to maximize true positives, we can decrease threshold to predict more positives, though at the expense of predicting more false positives.
 
 
   ![roc_fraud_10092018](https://user-images.githubusercontent.com/34787111/46713459-9a494600-cc0b-11e8-9ff6-73e6dcaa4399.png)
   
   Figure 1. ROC curves for fraud detection modeled by RandomForest and XGBoost.
   
-  To evaluate the importance / usefulness of features extracted, we output feature importances from both models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models, suggesting that they are well learned by machine learning models. In real business world, there are always a tradeoff between computation speed and model accuracy due to the big data. Can we select a few most important features for modeling to get comparable results as models built with full features? We re-built the RandomForest and XGBoost models using their top 15 most important features. Surprisingly, as shown in Table 2, there are almost no penalty with less features.
+  To evaluate the importance / usefulness of features extracted, we output feature importances from both models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models, suggesting that they are well learned by machine learning models. In real business world, there are always a tradeoff between computation speed and model accuracy due to the big amount of data. Can we select a few most important features for modeling to get comparable results as models built with full features? We re-built the RandomForest and XGBoost models using their top 15 most important features. Surprisingly and favorably, as shown in Table 2, there are almost no penalty with less features.
 
 |Rank|RandomForest|XGBoost|
 |:---:|:---:|:---:|
@@ -64,3 +64,10 @@ Table 2. Prediction metrics from both RandomForest and XGBoost. Here "selected f
 Table 3. The top 10 most important features based on RandomForest and XGBoost models.
 
 #Summary and business suggestion
+
+  We demonstrated feature extraction from original business dataset and built models using these features with excellent generalization capacity. The feature importances from the models confirm that the extracted features contribute the most for model learning and prediction.
+  
+  We also show that models using selected the most important features result in comparable prediction capability as those with full features. Given that we have a model enabling to predict the probability of committing a fraudulent activity, we may create different user experience:
+  1). If a user fraudulent probability is less than a threshold X, the user will have normal experience;
+  2). If a user fraudulent probability is larger than X but lower than a highly-suspicious threshold Y, the user can be directed to a page asking for additional verification via SMS / socical network account like Facebook;
+  3). If a user fraudulent probability is larger than Y, then this user should be prohibited or at least put on hold to check his / her login data for further decision.
