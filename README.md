@@ -1,4 +1,4 @@
-# Fraud detection: Exploring feature extraction for predicting fraudulent activity of the first transaction of a new user.
+# Fraud detection: Exploring feature extraction for predicting fraudulent activity of the first transaction of new users.
 
 This repo exemplifies feature extraction from raw dataset for building machine learning models to predict fraudulent transactions occurring in e-commerce websites. The original dataset contains all activities of a new user visiting a website, including sign-up time, purchase time, purchase value, ip address, device id, source, age and sex. Most of these activity records do not show patterns modelable by machine learning algorithms, which need either feature transformation or feature extraction for ML to learn and then predict. 
 
