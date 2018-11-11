@@ -42,8 +42,8 @@ Table 2. Prediction metrics from both RandomForest and XGBoost. Here "selected f
   After data preprocessing and split of train and test data, we can feed the data to machine learning models. Here we build both RandomForest and XGBoost models. Overall, two models result in very good performance (table 2), in particular predicting almost unity precision. However, recall has been sacrificed with the threshold (0.5) for perfect precision (almost no false negatives). Rather, receiver operating characteristics (roc) curve provides a threshold-independent measurement of evaluating model performance. As shown in Figure 1. generally both models perform well and show auc ~0.85. If we want to minimize false negatives, default threshold (0.5) works well (like the predictions from the two models). Well, if we want to maximize true positives, we can decrease threshold to predict more positives, though at the expense of predicting more false positives.
 
 
-  ![roc_fraud_10092018](https://user-images.githubusercontent.com/34787111/46713459-9a494600-cc0b-11e8-9ff6-73e6dcaa4399.png)
-  
+![download](https://user-images.githubusercontent.com/34787111/48307982-cc510f00-e50d-11e8-9adf-9b29ad83ecc3.png)
+
   Figure 1. ROC curves for fraud detection modeled by RandomForest and XGBoost.
   
   To evaluate the importance / usefulness of features extracted, we output feature importances from both models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models, suggesting that they are well learned by machine learning models. In real business world, there are always a tradeoff between computation speed and model accuracy due to the big amount of data. Can we select a few most important features for modeling to get comparable results as models built with full features? We re-built the RandomForest and XGBoost models using their top 15 most important features. Surprisingly and favorably, as shown in Table 2, there are almost no penalty with less features.
