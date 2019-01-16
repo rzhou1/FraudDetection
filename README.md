@@ -18,11 +18,11 @@ This repo exemplifies feature extraction from raw dataset for building machine l
   
 Table 1. Data's uniqueness in each column from the original dataset. 
   
-  1). The original signup time and purchase time are random, continuous and 100% unique, but the time difference ("time_diff") between signup time and purchase time may show characteristics of fraudulent activity, such as flash transaction suggesting automative trading, a constant time difference may also suggest fraudulent automotive trading, etc.
-  2). The ip address itself again does not carry characteristics for modeling (~95% data uniqueness). However, if many users use the same ip address, it may suggest fraudulent activity. Thus, we can extract feature of "ip_users" (how many unique users use the same ip address?).
-  3). Similarly, that many users use the same device for transaction suggests high possibility of fraudulent activity. Thus, we can create feature of "device_id_unique_users" (how many unique users use the same device_id for transaction?).
+  1). The original signup time and purchase time are random, continuous and 100% unique, but the time difference ("time_diff") between signup time and purchase time may show characteristics of fraudulent activity, such as flash transaction suggesting autonomous trading, constant or perodic time difference may also suggest fraudulent autonomous trading, etc.
+  2). The ip address itself again does not carry characteristics for modeling (~95% data uniqueness). However, if many users use the same ip address, the probability of conducting fraudulent activity could be high. Thus, feature "ip_users" (how many unique users use the same ip address?) will catch such activities.
+  3). Similarly, that many users use the same device for transaction suggests high possibility of fraudulent activity. Thus, feature of "device_id_unique_users" (how many unique users use the same device_id for transaction?) could be a nice detector.
   4). From signup time and purchase time, we can also create features of what day / week transactions are more frequently occurred. If there were traceable patterns of transactions occuring, it again shows more possibility of fraudulent activities. Thus, we could create features of "week_of_the_day" and "week_of_the_year" for both signup time and purchase time.
-  5). Besides, since device_id can be shared by many unique users, "total_purchase" and/or "average_purchase" for each device_id may also imply whether activities are fraudulent or not.
+  5). Besides, since device_id can be shared by many unique users, "total_purchase" and/or "average_purchase" for each device_id may imply whether activities are fraudulent or not.
   6). Fraudulent activities might occur more frequently in a particular region (country here). So, having a feature showing number of users ('country_count') from the same country might be useful (or redundant). Also, since there are over 200 countries, we may use 'country_count' to bin those countries showing relatively less entries, say, less than 200, as a single group.
   
 #Model
@@ -46,7 +46,7 @@ Table 2. Prediction metrics from both RandomForest and XGBoost. Here "selected f
 
   Figure 1. ROC curves for fraud detection modeled by RandomForest and XGBoost.
   
-  To evaluate the importance / usefulness of features extracted, we output feature importances from both models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models, suggesting that they are well learned by machine learning models. In real business world, there are always a tradeoff between computation speed and model accuracy due to the big amount of data. Can we select a few most important features for modeling to get comparable results as models built with full features? We re-built the RandomForest and XGBoost models using their top 15 most important features. Surprisingly and favorably, as shown in Table 2, there are almost no penalty with less features.
+  To evaluate the importance / usefulness of features extracted, we output feature importances from both models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models, suggesting that they are well learned by machine learning models. In real business world, there are always a tradeoff between computation speed and model accuracy due to the big amount of data. Can we select a few most important features for modeling to get comparable results as models built with full features? We re-built the RandomForest and XGBoost models using their top 15 most important features. Surprisingly and favorably, as shown in Table 2, there are almost no penalty with less_but_the_most_important features.
 
 |Rank|RandomForest|XGBoost|
 |:---:|:---:|:---:|
@@ -67,7 +67,7 @@ Table 3. The top 10 most important features based on RandomForest and XGBoost mo
 
   We demonstrated feature extraction from original business dataset and built models using these features with excellent generalization capacity. The feature importances from the models confirm that the extracted features contribute the most for model learning and prediction.
   
-  We also show that models using selected the most important features result in comparable prediction capability as those with full features. Given that we have a model enabling to predict the probability of committing a fraudulent activity, we may create different user experience:
+  We also show that models using the top-selected-most_important features result in comparable prediction capability as those with full features. Given that we have a model enabling to predict the probability of committing a fraudulent activity, we may create different user experience:
   1). If a user fraudulent probability is less than a threshold X, the user will have normal experience;
-  2). If a user fraudulent probability is larger than X but lower than a highly-suspicious threshold Y, the user can be directed to a page asking for additional verification via SMS / socical network account like Facebook;
+  2). If a user fraudulent probability is larger than X but lower than a highly-suspicious threshold Y, the user can be directed to a page asking for additional verification via SMS or socical network account like Facebook;
   3). If a user fraudulent probability is larger than Y, then this user should be prohibited or at least put on hold to check his / her login data for further decision.
