@@ -1,8 +1,7 @@
-'''Solution for fraudulent activities detection by using both tree-based models and logistic regressions.
-The solution also evaluates using the original full dataset and separating original dataset into non-flash-transaction dataset and flash-transaction dataset,
+'''Solution for fraudulent activities detection by xgboost.
+The solution evaluates using the original full dataset and separating original dataset into non-flash-transaction dataset and flash-transaction dataset,
 where the latter was discovered having unity fraud during EDA and modeling.
-The combined performance from model from non-flash-transaction and rule of flash-transaction is almost identical as that of the solution with full dataset,
-suggesting that the original data is not sufficient to catch all frauds.'''
+The combined performance from model from non-flash-transaction and rule of flash-transaction is almost identical as that of the solution with full dataset.'''
 
 import numpy as np
 import pandas as pd
