@@ -1,12 +1,12 @@
 # Fraud detection: Exploring feature extraction for predicting fraudulent activity of the first transaction of new users.
 
-This repo exemplifies feature extraction from raw dataset for building machine learning models to predict fraudulent transactions occurring in e-commerce websites. The original dataset contains all activities of a new user visiting a website, including sign-up time, purchase time, purchase value, ip address, device id, source, age and sex. Most of these activity records do not show patterns modelable by machine learning algorithms, which need either feature transformation or feature extraction for ML to learn and then predict. 
+This repo explores feature extraction from raw dataset to build machine learning models to detect fraudulent transactions occurring in an e-commerce website. The original dataset contains both bioinfo of new users (device id, ip address, source, browser, age, country and sex) and their activities (signup time, purchase time, purchase value). Exploratory data analysis reveals that flash transaction observed by counting time difference between purchase_time and signup_time is a strong indication of a fraud. Thus, here we demonstrate two models: one with full dataset and the other modeled without flash transaction observations, where the latter was then re-combined with flash transaction observations for comparing the metrics of these two models. 
 
 #Background
   
-  Transaction in e-commerce websites has high risk of users performing fraudulent activities such as doing money laundry, using stolen identity and credit card, etc. due to unscreened and diversified background of users. The rise in artificial intelligent (machine learning in specific) enables to detect these fraudulent activities with accuracy and real-time. However, the activities and background of a new user visiting a website (called data) are usually not directly learnable by machine learning algorithms. Feature extraction from activity records and feature transformation from user's background are a necessity as well as a prerequisite for building a machine learning model.
+  Transaction in e-commerce websites has high risk of users performing fraudulent activities such as doing money laundry, using stolen identity and credit card, etc. due to unscreened and diversified background of users. The rise in artificial intelligent (machine learning in specific) enables to detect these fraudulent activities with accuracy and real-time. However, the activities and background of a new user visiting a website are usually not directly learnable by traditional machine learning algorithms. Feature extraction from activity records and feature transformation from user's background are a necessity as well as a prerequisite.
     
-   In this repo, we have a dataset containing a website selling clothes and the first transaction activities of new users. The users' activity and background are collected when they visited and performed activities at the website. Here the purpose is to build a model to predict (in real time) whether a new user is performing fraudulent activity. Also, based on model outputs, what kind of users' experience could be recommended to the website.
+   In this repo, we have a dataset containing a website selling clothes and the first transaction activities of new users. The users' activity and background are collected when they visited and performed activities at the website. Here the purpose is to build a model to predict (in real time) whether a new user is performing fraudulent activity. Also, based on model outputs, what kind of users' experience could be recommended to the seller.
 
 #Feature extraction
 
@@ -14,54 +14,49 @@ This repo exemplifies feature extraction from raw dataset for building machine l
   
   |signup_time|purchase_time|purchase_value|device_id|browser|age|ip_address|country|
   |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-  |1.0|0.997135|0.000807|0.912939|0.000033|0.00038|0.94970|0.001198|  
+  |1.000|0.9971|0.0008|0.9129|0.00003|0.00038|0.9497|0.00119|  
   
 Table 1. Data's uniqueness in each column from the original dataset. 
   
   1). The original signup time and purchase time are random, continuous and 100% unique, but the time difference ("time_diff") between signup time and purchase time may show characteristics of fraudulent activity, such as flash transaction suggesting autonomous trading, constant or perodic time difference may also suggest fraudulent autonomous trading, etc.
   2). The ip address itself again does not carry characteristics for modeling (~95% data uniqueness). However, if many users use the same ip address, the probability of conducting fraudulent activity could be high. Thus, feature "ip_users" (how many unique users use the same ip address?) will catch such activities.
   3). Similarly, that many users use the same device for transaction suggests high possibility of fraudulent activity. Thus, feature of "device_id_unique_users" (how many unique users use the same device_id for transaction?) could be a nice detector.
-  4). From signup time and purchase time, we can also create features of what day / week transactions are more frequently occurred. If there were traceable patterns of transactions occuring, it again shows more possibility of fraudulent activities. Thus, we could create features of "week_of_the_day" and "week_of_the_year" for both signup time and purchase time.
+  4). From signup time and purchase time, we can also create features of what day / week transactions are more frequently occurred. If there were traceable patterns of transactions occuring, it again shows more possibility of fraudulent activities. Thus, we create features of "week_of_the_day" and "week_of_the_year" for both signup time and purchase time.
   5). Besides, since device_id can be shared by many unique users, "total_purchase" and/or "average_purchase" for each device_id may imply whether activities are fraudulent or not.
   6). Fraudulent activities might occur more frequently in a particular region (country here). So, having a feature showing number of users ('country_count') from the same country might be useful (or redundant). Also, since there are over 200 countries, we may use 'country_count' to bin those countries showing relatively less entries, say, less than 200, as a single group.
-  
+  7). 'purchase time' is not unique, which could be coincident due to high transaction traffic or could result from automatic transaction. Thus, here we create a feature 'purchase_times' by grouping-by the same purchase time.
+
 #Model
-   
-|Metrics|RandomForest|XGBoost|RandomForest (selected features)|XGBoost (selected features)|
-|:---:|:---:|:---:|:---:|:---:|
-|accuracy|0.958354|0.958596|0.958618|0.958596|
-|precision|0.993905|0.999562|1|0.999562|
-|recall|0.549194|0.548713|0.548713|0.548713|
-|f1|0.707468|0.708495|0.708605|0.708495|
-|auc|0.842105|0.850986|0.842105|0.850042|
-|confusion_matrix|[[41163, 14], [1874, 2283]]|[[41176, 1], [1876, 2281]]|[[41177, 0], [1876, 2281]]|[[41176, 1], [1876, 2281]]|
+|Metrics|original_val|original_test|non-flash_val|non-flash_test|combined_val|combined_test|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|auc|0.854|0.848|0.671|0.668|0.854|0.847|
+Table 2. Comparison of auc for models using original dataset, non-flash-transaction dataset, and re-combined non-flash-transaction and flash-transaction with both val and test.
   
-
-Table 2. Prediction metrics from both RandomForest and XGBoost. Here "selected features" means modeling with the top 15 most important features based on feature_importances output from the inital models with full features.
+  Data with extracted features were further processed to reduce skewness of numeric features, scale down large values of numeric features, and encode categorical features. Then the original data was splitted into train, val, and test sets. In order to have fair comparison, the data for non-flash-transaction model was splitted with exactly the same observations for train, val and test (by inheriting index of each splitted category).
+  Due to imbalanced nature of observations, we employ threshold-independent receiver operating characteristics (roc) curve to evaluating the performance of model. Here we demonstrate it using XGBoost. 
   
-  After data preprocessing and split of train and test data, we can feed the data to machine learning models. Here we build both RandomForest and XGBoost models. Overall, two models result in very good performance (table 2), in particular predicting almost unity precision. However, recall has been sacrificed with the threshold (0.5) for perfect precision (almost no false negatives). Rather, receiver operating characteristics (roc) curve provides a threshold-independent measurement of evaluating model performance. As shown in Figure 1. generally both models perform well and show auc ~0.85. If we want to minimize false negatives, default threshold (0.5) works well (like the predictions from the two models). Well, if we want to maximize true positives, we can decrease threshold to predict more positives, though at the expense of predicting more false positives.
+  As shown in Figure 1. generally both models perform well and show auc ~0.85. If we want to minimize false negatives, default threshold (0.5) works well (like the predictions from the two models). Well, if we want to maximize true positives, we can decrease threshold to predict more positives, though at the expense of predicting more false positives.
 
 
-![download](https://user-images.githubusercontent.com/34787111/48307982-cc510f00-e50d-11e8-9adf-9b29ad83ecc3.png)
 
-  Figure 1. ROC curves for fraud detection modeled by RandomForest and XGBoost.
+  Figure 1. ROC curves for fraud detection from XGBoost model (left: validation data, right: test data).
   
   To evaluate the importance / usefulness of features extracted, we output feature importances from both models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models, suggesting that they are well learned by machine learning models. In real business world, there are always a tradeoff between computation speed and model accuracy due to the big amount of data. Can we select a few most important features for modeling to get comparable results as models built with full features? We re-built the RandomForest and XGBoost models using their top 15 most important features. Surprisingly and favorably, as shown in Table 2, there are almost no penalty with less_but_the_most_important features.
 
-|Rank|RandomForest|XGBoost|
+|Rank|Original|non-flash-transaction|
 |:---:|:---:|:---:|
 |1|time_diff|time_diff|
-|2|WOTY_purchase|device_id_unique_users|
-|3|total_purchase|ip_address|
-|4|ip_users|device_id|
-|5|device_id_unique_users|age|
-|6|WOTY_signup|total_purchase|
-|7|DOTW_signup_Monday|source_direct|
-|8|DOTW_purchase_Monday|avg_purchase|
-|9|ip_address|WOTY_purchase|
-|10|avg_purchase|country_Belgium|
+|2|device_id_unique_users|device_id_unique_users|
+|3|total_purchase|age|
+|4|age|total_purchase|
+|5|source_Direct|country_count|
+|6|country_count|source_Direct|
+|7|country_Belgium|country_Belgium|
+|8|DOTW_purchase_Saturday|WOTY_purchase_3|
+|9|WOTY_purchase_43|browser_Safari|
+|10|WOTY_purchase_14|DOTW_purchase_Wednesday|
 
-Table 3. The top 10 most important features based on RandomForest and XGBoost models.
+Table 3. The top 10 most important features based on models using original dataset and non-flash-transaction dataset.
 
 #Summary and business suggestion
 
