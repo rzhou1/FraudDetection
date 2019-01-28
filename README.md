@@ -25,23 +25,27 @@ Table 1. Data's uniqueness in each column from the original dataset.
   5). Besides, since device_id can be shared by many unique users, "total_purchase" and/or "average_purchase" for each device_id may imply whether activities are fraudulent or not.
   6). Fraudulent activities might occur more frequently in a particular region (country here). So, having a feature showing number of users ('country_count') from the same country might be useful (or redundant). Also, since there are over 200 countries, we may use 'country_count' to bin those countries showing relatively less entries, say, less than 200, as a single group.
   7). 'purchase time' is not unique, which could be coincident due to high transaction traffic or could result from automatic transaction. Thus, here we create a feature 'purchase_times' by grouping-by the same purchase time.
+  
+#EDA
+
+
 
 #Model
+  Data with extracted features were further processed to reduce skewness of numeric features, scale down large values of numeric features, and encode categorical features. Then the original data was splitted into train, val, and test sets. In order to have fair comparison, the data for non-flash-transaction model was splitted with exactly the same observations for train, val and test (by inheriting index of each splitted category).
+  
 |Metrics|original_val|original_test|non-flash_val|non-flash_test|combined_val|combined_test|
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |auc|0.854|0.848|0.671|0.668|0.854|0.847|
-Table 2. Comparison of auc for models using original dataset, non-flash-transaction dataset, and re-combined non-flash-transaction and flash-transaction with both val and test.
+Table 2. Comparison of auc for models using original dataset, non-flash-transaction dataset, and re-combined non-flash-transaction and flash-transaction with both val and test.  
+
+  Due to imbalanced nature of observations, we chose threshold-independent receiver operating characteristics (roc) curve to evaluate model performance. As shown in Figure 1 and Table 2, the xgboost model results in good performance and excellent generalization capability given that val and test metrics results are well consistent. The non-flash-transaction model performs worse than that of the original, suggesting that there are no strong feature(s) favoriting fraud in non-flash-transaction dataset, which is consistent with EDA. However, once we re-combine the prediction from non-flash-transaction model and result (all given 1) from flash-transaction, the re-combined model shows exactly the same performance as the original. This infers that the observations from flash-transaction do not help model better 'generalize' those non-flash-transaction observations, likely partly due to the data nature (the first transactions of the new users). 
   
-  Data with extracted features were further processed to reduce skewness of numeric features, scale down large values of numeric features, and encode categorical features. Then the original data was splitted into train, val, and test sets. In order to have fair comparison, the data for non-flash-transaction model was splitted with exactly the same observations for train, val and test (by inheriting index of each splitted category).
-  Due to imbalanced nature of observations, we employ threshold-independent receiver operating characteristics (roc) curve to evaluating the performance of model. Here we demonstrate it using XGBoost. 
-  
-  As shown in Figure 1. generally both models perform well and show auc ~0.85. If we want to minimize false negatives, default threshold (0.5) works well (like the predictions from the two models). Well, if we want to maximize true positives, we can decrease threshold to predict more positives, though at the expense of predicting more false positives.
+  If we want to minimize false negatives, default threshold (0.5) works well (like the predictions from the two models). Well, if we want to maximize true positives, we can decrease threshold to predict more positives, though at the expense of predicting more false positives.
 
-
-
+![roc](https://user-images.githubusercontent.com/34787111/51809237-97726f80-2253-11e9-8978-a62fca8fb277.png)
   Figure 1. ROC curves for fraud detection from XGBoost model (left: validation data, right: test data).
   
-  To evaluate the importance / usefulness of features extracted, we output feature importances from both models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models, suggesting that they are well learned by machine learning models. In real business world, there are always a tradeoff between computation speed and model accuracy due to the big amount of data. Can we select a few most important features for modeling to get comparable results as models built with full features? We re-built the RandomForest and XGBoost models using their top 15 most important features. Surprisingly and favorably, as shown in Table 2, there are almost no penalty with less_but_the_most_important features.
+  To evaluate the importance / usefulness of features extracted, we extract feature importances from models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models. Interestingly, both models show that 'time_diff' and 'device_id_unique_users' are the two most important features, though for non-flash-transaction dataset, the statistical distribution in 'time_diff' and 'device_id_unique_users' are almost identical between fraud and normal.
 
 |Rank|Original|non-flash-transaction|
 |:---:|:---:|:---:|
