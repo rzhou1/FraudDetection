@@ -38,19 +38,13 @@ Table 1. Data's uniqueness in each column from the original dataset.
 
 Figure 1. Statistical distributions of time_diff among two classes from origianl (left) and non-flash-transaction (right) datasets.
 
- EDA was performed comprehensively in order to have a first understanding on the data and provides guidance for feature selection (please refer to Fraud_EDA.ipynb for more details). Here we briefly discuss three of the most informatives. The time_diff distribution in original data (Figure 1, left) clearly indicates that there is a unique distribution in short time_diff for fraud only, which suggest us to separate that part of data and then replot it (as shown in Figure 1, right). When went back to check the original data for that short time_diff part, they all show time_diff 1s with class 1 (fraud). Surpringly, there is almost identical between two classes after eliminating the 1s transaction time difference.
+ EDA was performed comprehensively in order to have a first understanding on the data and provides guidance for feature selection (please refer to Fraud_EDA.ipynb for more details). Here we briefly discuss two of the most informatives. The time_diff distribution in original data (Figure 1, left) clearly indicates that there is a unique distribution in short time_diff for fraud only, which suggest us to separate that part of data and then replot it (as shown in Figure 1, right). When went back to check the original data for that short time_diff part, they all show time_diff 1s with class 1 (fraud). Surpringly, there is almost identical between two classes after eliminating the 1s transaction time difference.
  
  ![device_id_unique_users](https://user-images.githubusercontent.com/34787111/51810212-52ead200-225b-11e9-854c-8f8073f9cfc0.png)
 
 Figure 2. Statistical distributions of device_id_unique_users among two classes from origianl (left) and non-flash-transaction (right) datasets.
 
    Similaryly, statistical plot of device_id_unique_users also show a distinct distribution region for fraud class, which has been completely removed after eliminating the 1s transaction observations (Figure 2). The ip_users shows strong linearity with device_id_unique_users when ip_users>1, which has been dropped for model for eliminating overfit from these two features.
-   
-![total_purchase](https://user-images.githubusercontent.com/34787111/51810216-554d2c00-225b-11e9-8378-5fc3446550b2.png)
-
-Figure 3. Statistical distributions of total_purchase among two classes from origianl (left) and non-flash-transaction (center) datasets and avg_purchase (right).
-
-   Statistical plot of total_purchase is more spreading, but again it is largely contributed from the 1s transaction observation. By comparing to avg_purchase, it does reveal that fraud tends to.pile up more purchase values by carrying out more frequent transactions (Figure 3).
 
 #Model
 
@@ -62,10 +56,10 @@ Figure 3. Statistical distributions of total_purchase among two classes from ori
 
 Table 2. Comparison of auc for models using original dataset, non-flash-transaction dataset, and re-combined non-flash-transaction and flash-transaction with both val and test.  
 
-  Due to imbalanced nature of observations, we chose threshold-independent receiver operating characteristics (roc) curve to evaluate model performance. As shown in Figure 4 and Table 2, the xgboost model results in good performance and excellent generalization capability given that val and test metrics results are well consistent. The non-flash-transaction model performs worse than that of the original, suggesting that there are no strong feature(s) favoriting fraud in non-flash-transaction dataset, which is consistent with EDA. However, once we re-combine the prediction from non-flash-transaction model and result (all given 1) from flash-transaction, the re-combined model shows exactly the same performance as the original. This infers that the observations from flash-transaction do not help model better 'generalize' those non-flash-transaction observations, likely partly due to the data nature (the first transactions of the new users). From roc, we can extract precision and recall by setting a threshold that is dependent on business model. If the bussiness prefer to minimizing false negatives, default threshold (0.5) works well (like the predictions from the two models). However, if the bussiness prefer to maximizing true positives, we can decrease threshold to predict more positives, though at the expense of predicting more false positives.
+  Due to imbalanced nature of observations, we chose threshold-independent receiver operating characteristics (roc) curve to evaluate model performance. As shown in Figure 3 and Table 2, the xgboost model results in good performance and excellent generalization capability given that val and test metrics results are well consistent. The non-flash-transaction model performs worse than that of the original, suggesting that there are no strong feature(s) favoriting fraud in non-flash-transaction dataset, which is consistent with EDA. However, once we re-combine the prediction from non-flash-transaction model and result (all given 1) from flash-transaction, the re-combined model shows exactly the same performance as the original. This infers that the observations from flash-transaction do not help model better 'generalize' those non-flash-transaction observations, likely partly due to the data nature (the first transactions of the new users). From roc, we can extract precision and recall by setting a threshold that is dependent on business model. If the bussiness prefer to minimizing false negatives, default threshold (0.5) works well (like the predictions from the two models). However, if the bussiness prefer to maximizing true positives, we can decrease threshold to predict more positives, though at the expense of predicting more false positives.
 
 ![roc](https://user-images.githubusercontent.com/34787111/51809237-97726f80-2253-11e9-8978-a62fca8fb277.png)
-  Figure 4. ROC curves for fraud detection from XGBoost model (left: validation data, right: test data).
+  Figure 3. ROC curves for fraud detection using XGBoost model (left: validation data, right: test data).
   
   To evaluate the importance / usefulness of features, we extract feature importances from models. As shown in Table 3, the extracted features are almost listed as the top 10 most important features in both models. Interestingly, both models show that 'time_diff' and 'device_id_unique_users' are the two most important features, though for non-flash-transaction dataset, the statistical distribution in 'time_diff' and 'device_id_unique_users' are almost identical between fraud and normal.
 
