@@ -36,6 +36,7 @@ Table 1. Data's uniqueness in each column from the original dataset.
 |Metrics|original_val|original_test|non-flash_val|non-flash_test|combined_val|combined_test|
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |auc|0.854|0.848|0.671|0.668|0.854|0.847|
+
 Table 2. Comparison of auc for models using original dataset, non-flash-transaction dataset, and re-combined non-flash-transaction and flash-transaction with both val and test.  
 
   Due to imbalanced nature of observations, we chose threshold-independent receiver operating characteristics (roc) curve to evaluate model performance. As shown in Figure 1 and Table 2, the xgboost model results in good performance and excellent generalization capability given that val and test metrics results are well consistent. The non-flash-transaction model performs worse than that of the original, suggesting that there are no strong feature(s) favoriting fraud in non-flash-transaction dataset, which is consistent with EDA. However, once we re-combine the prediction from non-flash-transaction model and result (all given 1) from flash-transaction, the re-combined model shows exactly the same performance as the original. This infers that the observations from flash-transaction do not help model better 'generalize' those non-flash-transaction observations, likely partly due to the data nature (the first transactions of the new users). 
